@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ttsLogo from "@/assets/homepage/TTS_Logo.png";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react"; // Import icons from lucide-react
 
 const navLinks = [
   { title: "HOME", path: "/" },
@@ -14,44 +16,102 @@ const navLinks = [
   // { title: "WHITEPAPER", path: "/whitepaper" },
 ];
 
+const menuVariants = {
+  open: {
+    opacity: 1,
+    height: "auto",
+    transition: {
+      duration: 0.3,
+    },
+  },
+  closed: {
+    opacity: 0,
+    height: 0,
+    transition: {
+      duration: 0.3,
+    },
+  },
+};
+
 const NavbarGreen = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <nav className="flex items-center justify-between h-20 px-44 pt-10">
-      {/* Left Section */}
-
-      {/* lOGO */}
-      <div>
-        <Image
-          src={ttsLogo}
-          alt="TTS Logo"
-          width={85}
-          height={85}
-          className="rounded-full"
-        />
-      </div>
-
-      {/* Middle Section */}
-      <div className="flex justify-center items-center space-x-10 bg-black rounded-3xl">
-        {/* Links */}
-        {navLinks.map((nav, index) => (
-          <div
-            key={index}
-            className="px-6 py-3 font-semibold text-white flex items-center cursor-pointer z-50"
-          >
-            {nav.path ? (
-              <Link href={nav.path} passHref className="hover:text-blue-500">
-                {nav.title}
-              </Link>
-            ) : (
-              <div className="group relative">
-                {/* Parent menu item */}
-                <span>{nav.title}</span>
-              </div>
-            )}
+    <>
+      <nav className="relative pt-10">
+        {/* Container with max-width */}
+        <div className="max-w-[1100px] mx-auto flex items-center justify-between h-20 px-6 md:px-0">
+          {/* Logo */}
+          <div className="flex-1 md:flex-none flex justify-center md:justify-start">
+            <Image
+              src={ttsLogo}
+              alt="TTS Logo"
+              width={85}
+              height={85}
+              className="rounded-full"
+            />
           </div>
-        ))}
-      </div>
-    </nav>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center bg-black rounded-3xl px-5 py-1">
+            {navLinks.map((nav, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 font-semibold text-white cursor-pointer z-50"
+              >
+                <Link href={nav.path} passHref className="hover:text-blue-500">
+                  {nav.title}
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden absolute top-0 right-0 mt-10 mr-6">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              {isOpen ? (
+                <X className="w-8 h-8 text-white" />
+              ) : (
+                <Menu className="w-8 h-8 text-white" />
+              )}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={menuVariants}
+            className="md:hidden bg-black overflow-hidden"
+          >
+            <div className="flex flex-col justify-center items-center">
+              {navLinks.map((nav, index) => (
+                <div
+                  key={index}
+                  className="px-6 py-3 font-semibold text-white cursor-pointer z-50"
+                >
+                  <Link
+                    href={nav.path}
+                    passHref
+                    className="hover:text-blue-500"
+                  >
+                    {nav.title}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
